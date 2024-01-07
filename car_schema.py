@@ -1,4 +1,4 @@
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
 
 #CSV import from spark gets numeric as string
 schema_price=StructType([
