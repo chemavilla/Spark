@@ -1,3 +1,13 @@
+'''
+   ETL process for car sales UK:
+   
+    1. Load csv files from dataset with a schema
+    2. Do several transformations: Remove outliers, join tables, remove null values, etc.
+    3. Create a new feature devaluation per year, remove null values
+    4. We load the adv DataFrame to a table in BigQuery for ML model with BigQuery ML
+
+'''
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import substring 
 from car_schema import *
