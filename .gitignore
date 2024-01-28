@@ -1,1 +1,4 @@
 __pycache*
+bigquery_connector/*
+spark-412615-782238bc9c36.json
+car_tables/Ads_table_feat*

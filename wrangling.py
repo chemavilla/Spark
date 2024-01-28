@@ -2,10 +2,20 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import substring 
 from car_schema import *
 
+# Google Cloud Platform configuration
+GCP_PROJECT_ID = "spark-412615"
+GCP_BIGQUERY_DATASET = "test"
+GCP_BIGQUERY_TABLE = "car_adv"
+GCP_TEMPORARY_BUCKET = "gs://temp_spark/"
+GCP_CREDENTIALS_JSON = 'spark-412615-782238bc9c36.json'
+
 # Connect with local spark 
 sprk_session = SparkSession.builder.master("local[1]") \
-                        .appName('SparkByExamples.com') \
+                        .appName('Wrangling car sales UK') \
                         .getOrCreate()
+
+# Problems with other methods to connect with GCP
+sprk_session._jsc.hadoopConfiguration().set("google.cloud.auth.service.account.json.keyfile",GCP_CREDENTIALS_JSON)
 
 # Load csv files from de dataset
 base_path = 'car_tables/'
@@ -43,8 +53,12 @@ df_ads_dev = df_ads.withColumn('Deval_year',
                                     / (df_ads.Reg_year - df_ads.Adv_year)
                               ).dropna(subset=['Deval_year'])
 
-
-# We save the features engineer for later for an ML model
-df_ads_dev.write.parquet(base_path + 'Ads_table_features.parquet', mode='overwrite')
+# We save the features engineered, for building a simple ML model later
+df_ads_dev.write.format('bigquery') \
+    .option("table", f"{GCP_PROJECT_ID}.{GCP_BIGQUERY_DATASET}.{GCP_BIGQUERY_TABLE}") \
+    .option('parentProject', GCP_PROJECT_ID) \
+    .option("temporaryGcsBucket", GCP_TEMPORARY_BUCKET) \
+    .mode("overwrite") \
+    .save()
 
 sprk_session.stop()
